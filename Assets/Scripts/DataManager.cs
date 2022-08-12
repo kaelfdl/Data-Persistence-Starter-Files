@@ -42,17 +42,27 @@ public class DataManager : MonoBehaviour
         public int score;
 
     }
+    [System.Serializable]
+    public class HighscoreData
+    {
+        public Player[] scores;
+    }
 
     public void SaveHighscore()
     {
         Player player = new Player();
         player.name = highscorePlayerName;
         player.score = highscore;
-        Player[] data = new Player[10];
-        data = playerHighscores.OrderBy(c => c.score).ToArray();
-        data[0] = player;
+        HighscoreData data = new HighscoreData();
+        data.scores = new Player[10];
+        if (playerHighscores.Count > 0)
+        {
 
-        string json = JsonHelper.ToJson(data);
+            data.scores = playerHighscores.OrderByDescending(c => c.score).Take(10).ToArray();
+        }
+        data.scores[9] = player;
+
+        string json = JsonHelper.ToJson(data.scores);
         Debug.Log(json);
         File.WriteAllText(Application.persistentDataPath + "/highscores.json", json);
     }
